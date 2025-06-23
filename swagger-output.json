@@ -283,7 +283,7 @@
         }
       }
     },
-    "/api/useAdvert/adverts/{id}": {
+    "/api/useAdvert/vendorAdverts/{id}": {
       "get": {
         "description": "",
         "parameters": [

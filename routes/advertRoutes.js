@@ -46,7 +46,7 @@ router.get(
   getAllAdverts
 );
 router.get(
-  "/adverts/:id",
+  "/vendorAdverts/:id",
   authMiddlewareHandler,
   authorizedRoles("vendor"),
   oneAdvert
