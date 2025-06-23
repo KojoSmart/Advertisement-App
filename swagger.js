@@ -5,9 +5,9 @@ const doc ={
     title: 'Advertisement-Management-API',
     description: 'Description'
   },
-  host: 'localhost:8008',
+  host: 'advertisement-app-1-gy0x.onrender.com',
 //   host: 'library-api-k879.onrender.com',
-  schemes: ['http']
+  schemes: ['https']
 }
 
 const outputFile = './swagger-output.json';
