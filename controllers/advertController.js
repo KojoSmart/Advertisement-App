@@ -3,7 +3,6 @@ require("dotenv").config();
 const mongoose = require("mongoose");
 const User = require("../models/userModel");
 
-
 // const cloudinary = require("cloudinary").v2;
 const cloudinary = require("../config/cloudinaryConfig");
 const fs = require("fs/promises");
@@ -82,12 +81,12 @@ const oneAdvert = async (req, res) => {
         message: "Invalid advert ID fromat",
       });
     }
-     
+
     const singleAdvert = await Advert.findById(id);
-    if (singleAdvert.vendor.toString() !== req.user.id ) {
-      return res.status(403).json({ 
-        success: false, 
-        message: "You are not allowed to see this advert." 
+    if (singleAdvert.vendor.toString() !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not allowed to see this advert.",
       });
     }
     if (!singleAdvert) {
@@ -110,9 +109,6 @@ const oneAdvert = async (req, res) => {
   }
 };
 
-
-
-
 const userOnlyViewAdvert = async (req, res) => {
   try {
     const { id } = req.params;
@@ -122,9 +118,9 @@ const userOnlyViewAdvert = async (req, res) => {
         message: "Invalid advert ID fromat",
       });
     }
-     
+
     const singleAdvert = await Advert.findById(id);
-    
+
     if (!singleAdvert) {
       return res.status(404).json({
         success: false,
@@ -175,9 +171,9 @@ const userOnlyViewAdvert = async (req, res) => {
 //     }
 //      // checkig to make sure  that only the vendor who owns it can update it
 //     if (advert.vendor.toString() !== req.user.id) {
-//       return res.status(403).json({ 
-//         success: false, 
-//         message: "You are not allowed to update  this advert." 
+//       return res.status(403).json({
+//         success: false,
+//         message: "You are not allowed to update  this advert."
 //       });
 //     }
 
@@ -247,7 +243,6 @@ const searchAdvert = async (req, res) => {
   }
 };
 
-
 // const updateAdvert = async (req, res) => {
 //   try {
 //     const id = req.params.id;
@@ -277,8 +272,6 @@ const searchAdvert = async (req, res) => {
 //         message: "Advert not found",
 //       });
 //     }
-
-    
 
 //     // Perform update
 //     const updatedAdvert = await Advert.findByIdAndUpdate(
@@ -312,13 +305,12 @@ const deleteAdvert = async (req, res) => {
       });
     }
 
-    const advert = await Advert.findById(id)
-      const user = await User.findById(id)
-      // checkig to make sure  that only the vendor who owns it can update it
-   if (advert.vendor.toString() !== req.user.id ) {
-      return res.status(403).json({ 
-        success: false, 
-        message: "You are not allowed to update  this advert." 
+    const advert = await Advert.findById(id);
+    // checkig to make sure  that only the vendor who owns it can update it
+    if (advert.vendor.toString() !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not allowed to update  this advert.",
       });
     }
     const delAdvert = await Advert.findByIdAndDelete(id);
@@ -343,7 +335,6 @@ const deleteAdvert = async (req, res) => {
   }
 };
 
-
 const updateAdvert = async (req, res) => {
   try {
     const id = req.params.id;
@@ -355,7 +346,7 @@ const updateAdvert = async (req, res) => {
       });
     }
 
-    const { error, value} = advertValidation.validate(req.body);
+    const { error, value } = advertValidation.validate(req.body);
     if (error) {
       return res.status(400).json({
         success: false,
@@ -377,16 +368,28 @@ const updateAdvert = async (req, res) => {
         message: "You are not allowed to update this advert.",
       });
     }
+    if (req.file) {
+      // deleting old image
+      if (advert.image && advert.image.public_id) {
+        await cloudinary.uploader.destroy(advert.image.public_id);
+      }
 
-    
-    const updatedAdvert = await Advert.findByIdAndUpdate(
-      id,
-        value ,
-      { new: true, runValidators: true}
-    );
-    
+      // Uploading  new image to Cloudinary
+      const result = await cloudinary.uploader.upload(req.file.path);
+        await fs.unlink(req.file.path); // delete from disk
 
-    
+
+      // Update image field in value
+      value.image = {
+        public_id: result.public_id,
+        url: result.secure_url,
+      };
+    }
+
+    const updatedAdvert = await Advert.findByIdAndUpdate(id, value,  {
+      new: true,
+      runValidators: true,
+    });
 
     return res.status(200).json({
       success: true,
@@ -410,5 +413,5 @@ module.exports = {
   deleteAdvert,
   updateAdvert,
   oneAdvert,
-  userOnlyViewAdvert
+  userOnlyViewAdvert,
 };

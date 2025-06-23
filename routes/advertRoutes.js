@@ -18,7 +18,7 @@ const {
 const x = require("../middlewares/authMiddleware");
 console.log(typeof x);
 
-// ✅ Only vendors can create
+// Only vendors can create
 
 router.post(
   "/vendorAddAdvert",
@@ -32,6 +32,8 @@ router.put(
   "/vendorUpdateAdvert/:id",
   authMiddlewareHandler,
   authorizedRoles("vendor"),
+  upload.single("file"),
+
   updateAdvert
 );
 router.delete(
