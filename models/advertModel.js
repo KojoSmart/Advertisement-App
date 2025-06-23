@@ -1,11 +1,21 @@
+const { required } = require("joi");
 const mongoose = require("mongoose");
 
 const advertSchema = new mongoose.Schema({
 
-  title: String,
+  title: {
+    type:String,
+    required:true
+  },
   description: String,
-  price: Number,
-  category: String,
+  price:{
+    type: Number,
+    required: true
+  },
+  category:{
+ type: String,
+  required: true
+  },
   image: {
     public_id: String,
     url: String
