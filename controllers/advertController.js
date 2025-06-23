@@ -1,0 +1,231 @@
+const Advert = require("../models/advertModel");
+require('dotenv').config();
+const mongoose = require('mongoose')
+
+// const cloudinary = require("cloudinary").v2;
+const cloudinary = require("../config/cloudinaryConfig")
+const fs = require("fs/promises");
+const path = require("path");
+const advertValidation = require('../utils/advertValidate')
+
+const createAdvert = async(req, res) =>{
+      try {
+        const {error, value}= advertValidation.validate(req.body);
+        if (error){
+          return res.status(400).json({
+            success: false,
+            error: error.details[0].message
+          })
+        }
+    const result = await cloudinary.uploader.upload(req.file.path);
+    await fs.unlink(req.file.path); // delete from disk
+
+    const advert = await Advert.create({
+      title: value.title,
+      description: value.description,
+      price: value.price,
+      category: value.category,
+      image: {
+        public_id: result.public_id,
+        url: result.secure_url
+      },
+      vendor: req.user.id
+    });
+    await advert.save()
+    // console.log(advert.image)
+    // console.log(advert.vendor)
+
+    res.status(201).json({ success: true, advert });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+    console.log(err.message)
+  }
+};
+
+// Getting all adverts
+const getAllAdverts= async (req, res)=>{
+  try {
+    const allAdverts = await Advert.find()
+
+    if(!allAdverts || allAdverts.length ===0){
+      return res.status(404).json({
+        success: false,
+        items: [],
+        message: "No adverts found"
+      })
+    }
+
+    return res.status(200).json({
+      success: true,
+      items: allAdverts,
+      message: 'Adverts retrieved successfully'
+    })
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+      message: 'Failed to retrieve adverts. An expected error occured'
+    })
+  }  
+};
+
+
+// Get one advert
+
+const oneAdvert = async (req, res)=>{
+  try {
+    const{id}= req.params
+    if(!mongoose.Types.ObjectId.isValid(id)){
+      return res.status(400).json({
+        success: false,
+        message: "Invalid advert ID fromat"
+      })
+    }
+    const singleAdvert = await Advert.findById(id)
+    if(!singleAdvert){
+      return res.status(404).json({
+        success: false,
+        message: "Advert not found"
+      })
+    }
+    return res.status(200).json({
+      sucess: true,
+      item: singleAdvert,
+      message: "Advert retrieved successfully"
+    })
+  } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to retrive book. An unexpected error occurred.',
+        error: error.message
+    })
+  }
+}
+
+// UpdatingAdvert
+const updateAdvert = async(req, res)=>{
+  try {
+    const id = req.params.id;
+    if(!mongoose.Types.ObjectId.isValid(id)){
+      return res.status(400).json({
+        success: false,
+        message: "Invalid advert ID format"
+      })
+    }
+
+    const{error, value}=advertValidation.validate(req.body);
+
+    if(error){
+      return res.status(400).json({
+        success:  false,
+        message: error.details[0].message
+      })
+    }
+ //  making sure  only the vendor who owns it can delete it
+    // if (advert.vendor.toString() !== req.user.id) {
+    //   return res.status(403).json({ success: false, message: "You are not allowed to delete this advert." });
+    // }
+
+    const updateAdvertDetails = await Advert.findByIdAndUpdate(
+      id,
+      value,
+      {new: true, runValidators: true}
+    )
+    if(!updateAdvertDetails){
+      return res.status(404).json({
+        success: false,
+        message: "Advert not found"
+      })
+    }
+    return res.status(200).json({
+      success: true,
+      item: updateAdvertDetails,
+      message: "Adverts updated successfully"
+    })
+  } catch (error) {
+    
+  }
+}
+// searching for adverts using title, price, category
+const searchAdvert= async (req, res)=>{
+try {
+   const{title, price,  category, } = req.query;
+      let searchByDetail = {};
+// Searching by title
+      if (title !== undefined) {
+  searchByDetail.title = { $regex: title, $options: "i" };
+}
+ // searching by category
+ if (category !== undefined) {
+  searchByDetail.category = { $regex: category, $options: "i" };
+}
+// searching by price
+ if (price !== undefined) {
+  searchByDetail.price = parseFloat(price);
+}
+
+ const theResult = await Advert.find(searchByDetail)
+
+ if(!theResult || theResult.length===0){
+  return res.status(404).json({
+        success: false,
+        items: null,
+        message: "No adverts found",
+      });
+ }
+     return res.status(200).json({
+      success: true,
+      items: allAdverts,
+      message: "Adverts retrieved successfully",
+    });
+} catch (error) {
+   return res.status(500).json({
+    success: false,
+    error: error.message,
+    message: "Failed to retrieve adverts. An unexpected error occured"
+   })
+}
+ 
+
+}
+
+const deleteAdvert = async(req, res)=>{
+  try {
+    
+    const {id}= req.params;
+     if(!mongoose.Types.ObjectId.isValid(id)){
+      return res.status(400).json({
+        success: false,
+        message: "Invalid advert ID format"
+      })
+    }
+
+    const delAdvert = await Advert.findByIdAndDelete(id);
+
+    if(!delAdvert){
+      return res.status(404).json({
+        success: false,
+        message: 'Advert not found'
+      })
+    }
+     // Delete image from Cloudinary
+    await cloudinary.uploader.destroy(delAdvert.image.public_id);
+    return res.status(200).json({
+      success: true,
+      message: "Advert deleted successfully"
+    })
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete an advert. An unexpected error occurred"
+    })
+  }
+}
+module.exports ={
+createAdvert,
+searchAdvert,
+getAllAdverts,
+deleteAdvert,
+updateAdvert,
+oneAdvert
+} 
