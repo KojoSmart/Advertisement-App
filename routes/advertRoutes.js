@@ -8,6 +8,7 @@ const {
   deleteAdvert,
   getAllAdverts,
   oneAdvert,
+  userOnlyViewAdvert
 } = require("../controllers/advertController");
 const upload = require("../middlewares/uploadMulter");
 const {
@@ -50,6 +51,13 @@ router.get(
   authMiddlewareHandler,
   authorizedRoles("vendor"),
   oneAdvert
+);
+
+router.get(
+  "/userOnlyViewAdverts/:id",
+  authMiddlewareHandler,
+  authorizedRoles("user"),
+  userOnlyViewAdvert
 );
 //  GET single advert by ID
 //router.get("/adverts/:id", getAdvertById);

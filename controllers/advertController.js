@@ -110,6 +110,41 @@ const oneAdvert = async (req, res) => {
   }
 };
 
+
+
+
+const userOnlyViewAdvert = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid advert ID fromat",
+      });
+    }
+     
+    const singleAdvert = await Advert.findById(id);
+    
+    if (!singleAdvert) {
+      return res.status(404).json({
+        success: false,
+        message: "Advert not found",
+      });
+    }
+    return res.status(200).json({
+      sucess: true,
+      item: singleAdvert,
+      message: "Advert retrieved successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to retrive book. An unexpected error occurred.",
+      error: error.message,
+    });
+  }
+};
+
 //UpdatingAdvert 2
 // const updateAdvert = async (req, res) => {
 //   try {
@@ -375,4 +410,5 @@ module.exports = {
   deleteAdvert,
   updateAdvert,
   oneAdvert,
+  userOnlyViewAdvert
 };
