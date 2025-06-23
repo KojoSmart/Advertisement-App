@@ -94,7 +94,7 @@ const forgotPassword = async (req, res) => {
     );
    // when the user press this link the frontend people will code a page to direct user to reset password
    // Just for practices
-   const resetLink = `http://localhost:3000/reset-password/${token}`;
+   const resetLink = `http://localhost:${process.env.PORT}/reset-password/${token}`;
 
     const mailOptions = {
       from: process.env.EMAIL_USER,

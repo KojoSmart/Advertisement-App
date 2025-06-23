@@ -42,13 +42,13 @@ router.delete(
 router.get(
   "/adverts",
   authMiddlewareHandler,
-  authorizedRoles("vendor", "user"),
+  authorizedRoles("user"),
   getAllAdverts
 );
 router.get(
   "/adverts/:id",
   authMiddlewareHandler,
-  authorizedRoles("vendor", "user"),
+  authorizedRoles("vendor"),
   oneAdvert
 );
 //  GET single advert by ID
