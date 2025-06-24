@@ -505,6 +505,34 @@ const updateAdvert = async (req, res) => {
   }
 };
 
+
+// Getting all advertsbyVendor
+const getAllAdvertsByVendor = async (req, res) => {
+  try {
+    // const allAdverts = await Advert.find();
+     // Get only the adverts belonging to the logged-in vendor
+    const allAdverts = await Advert.find({ vendor: req.user.id });
+    if (!allAdverts || allAdverts.length === 0) {
+      return res.status(404).json({
+        success: false,
+        items: [],
+        message: "No adverts found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      items: allAdverts,
+      message: "Adverts retrieved successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+      message: "Failed to retrieve adverts. An expected error occured",
+    });
+  }
+};
 module.exports = {
   createAdvert,
   searchAdvert,
@@ -513,4 +541,5 @@ module.exports = {
   updateAdvert,
   oneAdvert,
   userOnlyViewAdvert,
+  getAllAdvertsByVendor
 };

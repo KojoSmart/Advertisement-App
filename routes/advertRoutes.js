@@ -9,6 +9,7 @@ const {
   getAllAdverts,
   oneAdvert,
   userOnlyViewAdvert,
+  getAllAdvertsByVendor
 } = require("../controllers/advertController");
 const upload = require("../middlewares/uploadMulter");
 const {
@@ -43,16 +44,34 @@ router.delete(
   "/vendorDeleteAdvert/:id",
   authMiddlewareHandler,
   authorizedRoles("vendor"),
+  // #swagger.security = [{"bearerAuth": []}],
+
   deleteAdvert
+);
+
+router.get(
+  "/userSearchItem/:search",
+  authMiddlewareHandler,
+  authorizedRoles("users"),
+  //#swagger.security = [{"bearerAuth": []}],
+  searchAdvert
 );
 router.get(
   "/usersviewAlladverts",
   authMiddlewareHandler,
   authorizedRoles("user"),
   // #swagger.security = [{"bearerAuth": []}],
-
   getAllAdverts
 );
+
+router.get(
+  "/allAdvertsByVendor",
+  authMiddlewareHandler,
+  authorizedRoles("vendor"),
+  // #swagger.security = [{"bearerAuth": []}],
+  getAllAdvertsByVendor
+
+)
 router.get(
   "/vendorAdverts/:id",
   authMiddlewareHandler,
