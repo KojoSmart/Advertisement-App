@@ -59,7 +59,7 @@ router.get(
 router.get(
   "/usersviewAlladverts",
   authMiddlewareHandler,
-  authorizedRoles("user"),
+  //authorizedRoles("user"),
   // #swagger.security = [{"bearerAuth": []}],
   getAllAdverts
 );

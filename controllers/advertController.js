@@ -60,7 +60,7 @@ const getAllAdverts = async (req, res) => {
   try {
     const allAdverts = await Advert.find();
 
-    if (!allAdverts || allAdverts.length === 0) {
+    if (!allAdverts) {
       return res.status(404).json({
         success: false,
         items: [],
