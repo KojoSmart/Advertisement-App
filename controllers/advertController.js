@@ -6,11 +6,15 @@ const User = require("../models/userModel");
 // const cloudinary = require("cloudinary").v2;
 const cloudinary = require("../config/cloudinaryConfig");
 const fs = require("fs/promises");
-const path = require("path");
+// const path = require("path");
 const advertValidation = require("../utils/advertValidate");
 
 const createAdvert = async (req, res) => {
   try {
+    const { title, description, category, price } = req.body;
+
+    
+
     const { error, value } = advertValidation.validate(req.body);
     if (error) {
       return res.status(400).json({
@@ -18,12 +22,22 @@ const createAdvert = async (req, res) => {
         error: error.details[0].message,
       });
     }
+
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "No image file uploaded",
+      });
+    }
+
     const result = await cloudinary.uploader.upload(req.file.path);
-    await fs.unlink(req.file.path); // delete from disk
+     await fs.unlink(req.file.path);
+    console.log(req.file)
+    // console.log(result); // delete from disk
 
     const advert = await Advert.create({
-      title: value.title,
-      description: value.description,
+      title :value.title,
+      description : value.description,
       price: value.price,
       category: value.category,
       image: {
@@ -307,12 +321,12 @@ const deleteAdvert = async (req, res) => {
 
     const advert = await Advert.findById(id);
     // checkig to make sure  that only the vendor who owns it can update it
-    if (advert.vendor.toString() !== req.user.id) {
-      return res.status(403).json({
-        success: false,
-        message: "You are not allowed to update  this advert.",
-      });
-    }
+    // if (advert.vendor.toString() !== req.user.id) {
+    //   return res.status(403).json({
+    //     success: false,
+    //     message: "You are not allowed to update  this advert.",
+    //   });
+    // }
     const delAdvert = await Advert.findByIdAndDelete(id);
 
     if (!delAdvert) {
@@ -334,10 +348,11 @@ const deleteAdvert = async (req, res) => {
     });
   }
 };
-
+// original one 
 const updateAdvert = async (req, res) => {
   try {
     const id = req.params.id;
+    const { title, description, price, image, category } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
@@ -376,8 +391,7 @@ const updateAdvert = async (req, res) => {
 
       // Uploading  new image to Cloudinary
       const result = await cloudinary.uploader.upload(req.file.path);
-        await fs.unlink(req.file.path); // delete from disk
-
+      await fs.unlink(req.file.path); // delete from disk
 
       // Update image field in value
       value.image = {
@@ -386,7 +400,7 @@ const updateAdvert = async (req, res) => {
       };
     }
 
-    const updatedAdvert = await Advert.findByIdAndUpdate(id, value,  {
+    const updatedAdvert = await Advert.findByIdAndUpdate(id, value, {
       new: true,
       runValidators: true,
     });
@@ -405,6 +419,94 @@ const updateAdvert = async (req, res) => {
     });
   }
 };
+
+// new one
+// const updateAdvert = async (req, res, next) => {
+//   try {
+//     const id = req.params.id;
+//     const { title, description, category, price,  } = req.body;
+//     const image = req.file;
+
+//     if (!mongoose.Types.ObjectId.isValid(id)) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Invalid advert ID format",
+//         data: null,
+//         error: null,
+//       });
+//     }
+
+//     const advert = await Advert.findById(id);
+//     if (!advert) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Advert not found",
+//         data: null,
+//         error: null,
+//       });
+//     }
+
+//     // Vendor permission check
+//     if (advert.vendor.toString() !== req.user.id) {
+//       return res.status(403).json({
+//         success: false,
+//         message: "You are not allowed to update this advert",
+//         data: null,
+//         error: null,
+//       });
+//     }
+
+//     // Validate request
+//     const { error, value } = advertValidation.validate(req.body, {
+//       abortEarly: false,
+//     });
+
+//     if (error) {
+//       return res.status(422).json({
+//         success: false,
+//         message: "Validation failed",
+//         data: null,
+//         error: error.details.map((err) => err.message),
+//       });
+//     }
+
+//     // Handle image upload
+//     if (req.file) {
+//       // Delete old image from Cloudinary
+//       if (advert.image && advert.image.public_id) {
+//         await cloudinary.uploader.destroy(advert.image.public_id);
+//       }
+
+//       // Upload new image
+//       const result = await cloudinary.uploader.upload(req.file.path);
+//       await fs.unlink(req.file.path);
+
+//       // Set new image
+//       advert.image = {
+//         public_id: result.public_id,
+//         url: result.secure_url,
+//       };
+//     }
+
+//     // Update only provided fields
+//     advert.title = title !== undefined ? title : advert.title;
+//     advert.description = description !== undefined ? description : advert.description;
+//     advert.category = category !== undefined ? category : advert.category;
+//     advert.price = price !== undefined ? price : advert.price;
+//     advert.image = image !== undefined ? image : advert.image
+
+//     const updatedAdvert = await advert.save();
+
+//     return res.status(200).json({
+//       success: true,
+//       message: "Advert updated successfully",
+//       data: updatedAdvert,
+//       error: null,
+//     });
+//   } catch (err) {
+//     console.log(message.err)
+//   }
+// };
 
 module.exports = {
   createAdvert,

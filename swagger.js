@@ -1,16 +1,27 @@
-const swaggerAutogen = require("swagger-autogen") ();
+const swaggerAutogen = require("swagger-autogen")();
 
-const doc ={
+const doc = {
   info: {
-    title: 'Advertisement-Management-API',
-    description: 'Description'
+    title: "Advertisement-Management-API",
+    description: "Description",
   },
-  host: 'advertisement-app-1-gy0x.onrender.com',
-//   host: 'library-api-k879.onrender.com',
-  schemes: ['https']
-}
+  host: "advertisement-app-1-gy0x.onrender.com",
+  //   host: 'library-api-k879.onrender.com',
+  schemes: ["https"],
 
-const outputFile = './swagger-output.json';
-const routes = ['./app.js'];
+  components: {
+    securitySchemes: {
+      bearerAuth: {
+        type: "http",
+        scheme: "bearer",
+        bearerFormat: "JWT",
+      },
+    },
+  },
+  // security : [{bearerAuth: [] }],
+};
+
+const outputFile = "./swagger-output.json";
+const routes = ["./routes/advertRoutes.js", "./routes/authRoutes.js"];
 
 swaggerAutogen(outputFile, routes, doc);

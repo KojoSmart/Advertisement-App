@@ -24,7 +24,9 @@ router.post(
   "/vendorAddAdvert",
   authMiddlewareHandler,
   authorizedRoles("vendor"),
-  upload.single("file"),
+  upload.single("image"),
+  // #swagger.security = [{"bearerAuth": []}],
+
   createAdvert
 );
 
@@ -33,6 +35,7 @@ router.put(
   authMiddlewareHandler,
   authorizedRoles("vendor"),
   upload.single("file"),
+  // #swagger.security = [{"bearerAuth": []}],
 
   updateAdvert
 );
@@ -43,15 +46,19 @@ router.delete(
   deleteAdvert
 );
 router.get(
-  "/adverts",
+  "/usersviewAlladverts",
   authMiddlewareHandler,
   authorizedRoles("user"),
+  // #swagger.security = [{"bearerAuth": []}],
+
   getAllAdverts
 );
 router.get(
   "/vendorAdverts/:id",
   authMiddlewareHandler,
   authorizedRoles("vendor"),
+  // #swagger.security = [{"bearerAuth": [] }],
+
   oneAdvert
 );
 
@@ -59,6 +66,7 @@ router.get(
   "/userOnlyViewAdverts/:id",
   authMiddlewareHandler,
   authorizedRoles("user"),
+  // #swagger.security = [{"bearerAuth": []}]
   userOnlyViewAdvert
 );
 //  GET single advert by ID
