@@ -8,7 +8,7 @@ const {
   deleteAdvert,
   getAllAdverts,
   oneAdvert,
-  userOnlyViewAdvert
+  userOnlyViewAdvert,
 } = require("../controllers/advertController");
 const upload = require("../middlewares/uploadMulter");
 const {

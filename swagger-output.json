@@ -80,27 +80,6 @@
             "name": "authorization",
             "in": "header",
             "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "title": {
-                  "example": "any"
-                },
-                "description": {
-                  "example": "any"
-                },
-                "category": {
-                  "example": "any"
-                },
-                "price": {
-                  "example": "any"
-                }
-              }
-            }
           }
         ],
         "responses": {
@@ -119,8 +98,8 @@
           "404": {
             "description": "Not Found"
           },
-          "422": {
-            "description": "Unprocessable Entity"
+          "500": {
+            "description": "Internal Server Error"
           }
         },
         "security": [
@@ -168,7 +147,7 @@
         }
       }
     },
-    "/adverts": {
+    "/usersviewAlladverts": {
       "get": {
         "description": "",
         "parameters": [

@@ -349,90 +349,23 @@ const deleteAdvert = async (req, res) => {
   }
 };
 // original one 
-const updateAdvert = async (req, res) => {
-  try {
-    const id = req.params.id;
-    const { title, description, price, image, category } = req.body;
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid advert ID format",
-      });
-    }
-
-    const { error, value } = advertValidation.validate(req.body);
-    if (error) {
-      return res.status(400).json({
-        success: false,
-        message: error.details[0].message,
-      });
-    }
-
-    const advert = await Advert.findById(id);
-    if (!advert) {
-      return res.status(404).json({
-        success: false,
-        message: "Advert not found",
-      });
-    }
-
-    if (advert.vendor.toString() !== req.user.id) {
-      return res.status(403).json({
-        success: false,
-        message: "You are not allowed to update this advert.",
-      });
-    }
-    if (req.file) {
-      // deleting old image
-      if (advert.image && advert.image.public_id) {
-        await cloudinary.uploader.destroy(advert.image.public_id);
-      }
-
-      // Uploading  new image to Cloudinary
-      const result = await cloudinary.uploader.upload(req.file.path);
-      await fs.unlink(req.file.path); // delete from disk
-
-      // Update image field in value
-      value.image = {
-        public_id: result.public_id,
-        url: result.secure_url,
-      };
-    }
-
-    const updatedAdvert = await Advert.findByIdAndUpdate(id, value, {
-      new: true,
-      runValidators: true,
-    });
-
-    return res.status(200).json({
-      success: true,
-      item: updatedAdvert,
-      message: "Advert updated successfully",
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      error: error.message,
-
-      message: "Failed to update advert. An unexpected error occurred.",
-    });
-  }
-};
-
-// new one
-// const updateAdvert = async (req, res, next) => {
+//  const updateAdvert = async (req, res) => {
 //   try {
 //     const id = req.params.id;
-//     const { title, description, category, price,  } = req.body;
-//     const image = req.file;
+//     const { title, description, price, image, category } = req.body;
 
 //     if (!mongoose.Types.ObjectId.isValid(id)) {
 //       return res.status(400).json({
 //         success: false,
 //         message: "Invalid advert ID format",
-//         data: null,
-//         error: null,
+//       });
+//     }
+
+//     const { error, value } = advertValidation.validate(req.body);
+//     if (error) {
+//       return res.status(400).json({
+//         success: false,
+//         message: error.details[0].message,
 //       });
 //     }
 
@@ -441,72 +374,135 @@ const updateAdvert = async (req, res) => {
 //       return res.status(404).json({
 //         success: false,
 //         message: "Advert not found",
-//         data: null,
-//         error: null,
 //       });
 //     }
 
-//     // Vendor permission check
 //     if (advert.vendor.toString() !== req.user.id) {
 //       return res.status(403).json({
 //         success: false,
-//         message: "You are not allowed to update this advert",
-//         data: null,
-//         error: null,
+//         message: "You are not allowed to update this advert.",
 //       });
 //     }
-
-//     // Validate request
-//     const { error, value } = advertValidation.validate(req.body, {
-//       abortEarly: false,
-//     });
-
-//     if (error) {
-//       return res.status(422).json({
-//         success: false,
-//         message: "Validation failed",
-//         data: null,
-//         error: error.details.map((err) => err.message),
-//       });
-//     }
-
-//     // Handle image upload
 //     if (req.file) {
-//       // Delete old image from Cloudinary
+//       // deleting old image
 //       if (advert.image && advert.image.public_id) {
 //         await cloudinary.uploader.destroy(advert.image.public_id);
 //       }
 
-//       // Upload new image
+//       // Uploading  new image to Cloudinary
 //       const result = await cloudinary.uploader.upload(req.file.path);
-//       await fs.unlink(req.file.path);
+//       await fs.unlink(req.file.path); // delete from disk
 
-//       // Set new image
-//       advert.image = {
+//       // Update image field in value
+//       value.image = {
 //         public_id: result.public_id,
 //         url: result.secure_url,
 //       };
 //     }
 
-//     // Update only provided fields
-//     advert.title = title !== undefined ? title : advert.title;
-//     advert.description = description !== undefined ? description : advert.description;
-//     advert.category = category !== undefined ? category : advert.category;
-//     advert.price = price !== undefined ? price : advert.price;
-//     advert.image = image !== undefined ? image : advert.image
-
-//     const updatedAdvert = await advert.save();
+//     const updatedAdvert = await Advert.findByIdAndUpdate(id, value, {
+//       new: true,
+//       runValidators: true,
+//     });
 
 //     return res.status(200).json({
 //       success: true,
+//       item: updatedAdvert,
 //       message: "Advert updated successfully",
-//       data: updatedAdvert,
-//       error: null,
 //     });
-//   } catch (err) {
-//     console.log(message.err)
+//   } catch (error) {
+//     return res.status(500).json({
+//       success: false,
+//       error: error.message,
+
+//       message: "Failed to update advert. An unexpected error occurred.",
+//     });
 //   }
 // };
+
+
+const updateAdvert = async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    // Check if advert ID is valid
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid advert ID format",
+      });
+    }
+
+    // Find existing advert
+    const advert = await Advert.findById(id);
+    if (!advert) {
+      return res.status(404).json({
+        success: false,
+        message: "Advert not found",
+      });
+    }
+
+    // Check permission
+    if (advert.vendor.toString() !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not allowed to update this advert.",
+      });
+    }
+
+    // Validate input excluding image, which comes from req.file
+    const { error, value } = advertValidation.validate(req.body, { abortEarly: false });
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: "Validation failed",
+        error: error.details.map((err) => err.message),
+      });
+    }
+
+    // Handle image if one is uploaded
+    if (req.file) {
+      if (advert.image && advert.image.public_id) {
+        await cloudinary.uploader.destroy(advert.image.public_id);
+      }
+
+      const result = await cloudinary.uploader.upload(req.file.path);
+      await fs.unlink(req.file.path); // Clean up temp file
+
+      value.image = {
+        public_id: result.public_id,
+        url: result.secure_url,
+      };
+    }
+ const updatedAdvert = await Advert.findByIdAndUpdate(id, value, {
+      new: true,
+      runValidators: true,
+    });
+    await updatedAdvert.save()
+    // Update only the provided fields
+    // advert.title = value.title !== undefined ? value.title : advert.title;
+    // advert.description = value.description !== undefined ? value.description : advert.description;
+    // advert.category = value.category !== undefined ? value.category : advert.category;
+    // advert.price = value.price !== undefined ? value.price : advert.price;
+    // if (value.image) advert.image = value.image;
+
+    // Save the updated advert
+    // const updatedAdvert = await advert.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Advert updated successfully",
+      item: updatedAdvert,
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update advert. An unexpected error occurred.",
+      error: error.message,
+    });
+  }
+};
 
 module.exports = {
   createAdvert,
