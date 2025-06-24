@@ -13,8 +13,6 @@ const createAdvert = async (req, res) => {
   try {
     const { title, description, category, price } = req.body;
 
-    
-
     const { error, value } = advertValidation.validate(req.body);
     if (error) {
       return res.status(400).json({
@@ -31,13 +29,13 @@ const createAdvert = async (req, res) => {
     }
 
     const result = await cloudinary.uploader.upload(req.file.path);
-     await fs.unlink(req.file.path);
-    console.log(req.file)
+    await fs.unlink(req.file.path);
+    console.log(req.file);
     // console.log(result); // delete from disk
 
     const advert = await Advert.create({
-      title :value.title,
-      description : value.description,
+      title: value.title,
+      description: value.description,
       price: value.price,
       category: value.category,
       image: {
@@ -348,7 +346,7 @@ const deleteAdvert = async (req, res) => {
     });
   }
 };
-// original one 
+// original one
 //  const updateAdvert = async (req, res) => {
 //   try {
 //     const id = req.params.id;
@@ -420,9 +418,11 @@ const deleteAdvert = async (req, res) => {
 //   }
 // };
 
-
 const updateAdvert = async (req, res) => {
+      const { title, description, category, price } = req.body;
+
   try {
+
     const id = req.params.id;
 
     // Check if advert ID is valid
@@ -451,7 +451,9 @@ const updateAdvert = async (req, res) => {
     }
 
     // Validate input excluding image, which comes from req.file
-    const { error, value } = advertValidation.validate(req.body, { abortEarly: false });
+    const { error, value } = advertValidation.validate(req.body, {
+      abortEarly: false,
+    });
     if (error) {
       return res.status(400).json({
         success: false,
@@ -474,11 +476,11 @@ const updateAdvert = async (req, res) => {
         url: result.secure_url,
       };
     }
- const updatedAdvert = await Advert.findByIdAndUpdate(id, value, {
+    const updatedAdvert = await Advert.findByIdAndUpdate(id, value, {
       new: true,
       runValidators: true,
     });
-    await updatedAdvert.save()
+    await updatedAdvert.save();
     // Update only the provided fields
     // advert.title = value.title !== undefined ? value.title : advert.title;
     // advert.description = value.description !== undefined ? value.description : advert.description;
@@ -486,7 +488,7 @@ const updateAdvert = async (req, res) => {
     // advert.price = value.price !== undefined ? value.price : advert.price;
     // if (value.image) advert.image = value.image;
 
-    // Save the updated advert
+    // // Save the updated advert
     // const updatedAdvert = await advert.save();
 
     return res.status(200).json({
@@ -494,7 +496,6 @@ const updateAdvert = async (req, res) => {
       message: "Advert updated successfully",
       item: updatedAdvert,
     });
-
   } catch (error) {
     return res.status(500).json({
       success: false,
