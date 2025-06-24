@@ -58,9 +58,9 @@ const createAdvert = async (req, res) => {
 // Getting all adverts
 const getAllAdverts = async (req, res) => {
   try {
-    const allAdverts = await Advert.find();
+    const allAdverts = await Advert.find({});
 
-    if (!allAdverts) {
+    if (!allAdverts || allAdverts.length === 0) {
       return res.status(404).json({
         success: false,
         items: [],
@@ -419,10 +419,9 @@ const deleteAdvert = async (req, res) => {
 // };
 
 const updateAdvert = async (req, res) => {
-      const { title, description, category, price } = req.body;
+  const { title, description, category, price } = req.body;
 
   try {
-
     const id = req.params.id;
 
     // Check if advert ID is valid
@@ -505,12 +504,11 @@ const updateAdvert = async (req, res) => {
   }
 };
 
-
 // Getting all advertsbyVendor
 const getAllAdvertsByVendor = async (req, res) => {
   try {
     // const allAdverts = await Advert.find();
-     // Get only the adverts belonging to the logged-in vendor
+    // Get only the adverts belonging to the logged-in vendor
     const allAdverts = await Advert.find({ vendor: req.user.id });
     if (!allAdverts || allAdverts.length === 0) {
       return res.status(404).json({
@@ -541,5 +539,5 @@ module.exports = {
   updateAdvert,
   oneAdvert,
   userOnlyViewAdvert,
-  getAllAdvertsByVendor
+  getAllAdvertsByVendor,
 };

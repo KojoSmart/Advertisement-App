@@ -9,7 +9,7 @@ const {
   getAllAdverts,
   oneAdvert,
   userOnlyViewAdvert,
-  getAllAdvertsByVendor
+  getAllAdvertsByVendor,
 } = require("../controllers/advertController");
 const upload = require("../middlewares/uploadMulter");
 const {
@@ -70,8 +70,7 @@ router.get(
   authorizedRoles("vendor"),
   // #swagger.security = [{"bearerAuth": []}],
   getAllAdvertsByVendor
-
-)
+);
 router.get(
   "/vendorAdverts/:id",
   authMiddlewareHandler,

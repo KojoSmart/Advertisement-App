@@ -1,6 +1,4 @@
-
 const Joi = require("joi");
-
 
 const advertValidation = Joi.object({
   title: Joi.string().min(1).max(100).required().messages({
@@ -17,7 +15,7 @@ const advertValidation = Joi.object({
   category: Joi.string().required().messages({
     "string.empty": "Category name is required",
   }),
-  image: Joi.string()
+  image: Joi.string(),
 });
 
-module.exports = advertValidation
+module.exports = advertValidation;
