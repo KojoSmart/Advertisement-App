@@ -29,7 +29,7 @@ router.post(
   // #swagger.security = [{"bearerAuth": []}],
  createAdvert
 );
-router.get("/userOnlyViewAdverts/:id", userOnlyViewAdvertById);
+router.get("/userOnlyViewAdverts/:id", authMiddlewareHandler, userOnlyViewAdvertById);
 
 router.put(
   "/vendorUpdateAdvert/:id",

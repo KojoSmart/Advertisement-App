@@ -130,7 +130,7 @@ const userOnlyViewAdvertById = async (req, res) => {
         message: "Invalid advert ID fromat",
       });
     }
-      console.log("userOnlyViewAdvert called");
+    console.log("userOnlyViewAdvert called");
 
     const singleAdvert = await Advert.findById(id);
 
@@ -141,7 +141,7 @@ const userOnlyViewAdvertById = async (req, res) => {
       });
     }
     return res.status(200).json({
-      sucess: true,
+      success: true,
       item: singleAdvert,
       message: "Advert retrieved successfully",
     });
@@ -153,8 +153,6 @@ const userOnlyViewAdvertById = async (req, res) => {
     });
   }
 };
-
-  
 
 // searching for adverts using title, price, category
 const searchAdvert = async (req, res) => {
