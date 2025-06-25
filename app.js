@@ -5,13 +5,13 @@ const authRoutes = require("./routes/authRoutes");
 const advertRoutes = require("./routes/advertRoutes");
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger-output.json");
-const cors = require("cors")
+const cors = require("cors");
 // const adRoutes = require("./routes/advertRoutes");
 
 const app = express();
 
 app.use(express.json());
-app.use(cors())
+app.use(cors());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/useAdvert", advertRoutes);

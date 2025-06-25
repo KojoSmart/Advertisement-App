@@ -121,7 +121,7 @@ const oneAdvert = async (req, res) => {
   }
 };
 
-const userOnlyViewAdvert = async (req, res) => {
+const userOnlyViewAdvertById = async (req, res) => {
   try {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -130,6 +130,7 @@ const userOnlyViewAdvert = async (req, res) => {
         message: "Invalid advert ID fromat",
       });
     }
+      console.log("userOnlyViewAdvert called");
 
     const singleAdvert = await Advert.findById(id);
 
@@ -153,66 +154,7 @@ const userOnlyViewAdvert = async (req, res) => {
   }
 };
 
-//UpdatingAdvert 2
-// const updateAdvert = async (req, res) => {
-//   try {
-//     const id = req.params.id;
-//     // if (!mongoose.Types.ObjectId.isValid(id)) {
-//     //   return res.status(400).json({
-//     //     success: false,
-//     //     message: "Invalid advert ID format",
-//     //   });
-//     // }
-
-//     const { error, value } = advertValidation.validate(req.body);
-
-//     if (error) {
-//       return res.status(400).json({
-//         success: false,
-//         message: error.details[0].message,
-//       });
-//     }
-
-//      // Find the advert first
-//     const advert = await Advert.findById(id);
-//     if (!advert) {
-//       return res.status(404).json({
-//         success: false,
-//         message: "Advert not found",
-//       });
-//     }
-//      // checkig to make sure  that only the vendor who owns it can update it
-//     if (advert.vendor.toString() !== req.user.id) {
-//       return res.status(403).json({
-//         success: false,
-//         message: "You are not allowed to update  this advert."
-//       });
-//     }
-
-//     const updateAdvert = await Advert.findByIdAndUpdate(
-//       id,
-//        {$set: value} ,
-//       { new: true, runValidators: true }
-//     );
-//     // if(!updateAdvertDetails){
-//     //   return res.status(404).json({
-//     //     success: false,
-//     //     message: "Advert not found"
-//     //   })
-//     // }
-//     return res.status(200).json({
-//       success: true,
-//       item: updateAdvert,
-//       message: "Adverts updated successfully",
-//     });
-//   } catch (error) {
-//       return res.status(500).json({
-//       success: false,
-//       error: error.message,
-//       message: "Failed to update adverts. An unexpected error occured",
-//     });
-//   }
-// };
+  
 
 // searching for adverts using title, price, category
 const searchAdvert = async (req, res) => {
@@ -538,6 +480,6 @@ module.exports = {
   deleteAdvert,
   updateAdvert,
   oneAdvert,
-  userOnlyViewAdvert,
+  userOnlyViewAdvertById,
   getAllAdvertsByVendor,
 };

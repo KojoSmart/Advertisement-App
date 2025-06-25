@@ -8,7 +8,7 @@ const {
   deleteAdvert,
   getAllAdverts,
   oneAdvert,
-  userOnlyViewAdvert,
+  userOnlyViewAdvertById,
   getAllAdvertsByVendor,
 } = require("../controllers/advertController");
 const upload = require("../middlewares/uploadMulter");
@@ -27,18 +27,17 @@ router.post(
   authorizedRoles("vendor"),
   upload.single("image"),
   // #swagger.security = [{"bearerAuth": []}],
-
-  createAdvert
+ createAdvert
 );
+router.get("/userOnlyViewAdverts/:id", userOnlyViewAdvertById);
 
 router.put(
   "/vendorUpdateAdvert/:id",
   authMiddlewareHandler,
   authorizedRoles("vendor"),
-  upload.single("file"),
+  upload.single("image"),
   // #swagger.security = [{"bearerAuth": []}],
-
-  updateAdvert
+   updateAdvert
 );
 router.delete(
   "/vendorDeleteAdvert/:id",
@@ -58,9 +57,7 @@ router.get(
 );
 router.get(
   "/usersviewAlladverts",
-  // authMiddlewareHandler,
-  //authorizedRoles("user"),
-  // #swagger.security = [{"bearerAuth": []}],
+ 
   getAllAdverts
 );
 
@@ -80,13 +77,8 @@ router.get(
   oneAdvert
 );
 
-router.get(
-  "/userOnlyViewAdverts/:id",
-  authMiddlewareHandler,
-  authorizedRoles("user"),
-  // #swagger.security = [{"bearerAuth": []}]
-  userOnlyViewAdvert
-);
+
+
 //  GET single advert by ID
 //router.get("/adverts/:id", getAdvertById);
 
