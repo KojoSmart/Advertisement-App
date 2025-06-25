@@ -7,7 +7,7 @@ const doc = {
   },
   host: "advertisement-app-1-gy0x.onrender.com",
   // host: "localhost:8008",
-  // schemes: ["https"],
+  // schemes: ["http"],
   schemes: ["https"],
   components: {
     securitySchemes: {

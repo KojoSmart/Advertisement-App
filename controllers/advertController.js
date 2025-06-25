@@ -203,48 +203,102 @@ const userOnlyViewAdvertById = async (req, res) => {
 //     });
 //   }
 // };
-
-
-// searching for adverts using title, price, category
 const searchAdvert = async (req, res) => {
   try {
     const { title, price, category } = req.query;
     let searchByDetail = {};
+
     // Searching by title
     if (title !== undefined) {
       searchByDetail.title = { $regex: title, $options: "i" };
     }
-    // searching by category
+
+    // Searching by category
     if (category !== undefined) {
       searchByDetail.category = { $regex: category, $options: "i" };
     }
-    // searching by price
+
+    // Searching by price
     if (price !== undefined) {
       searchByDetail.price = parseFloat(price);
     }
 
     const theResult = await Advert.find(searchByDetail);
 
-    if (!theResult) {
+    if (theResult.length === 0) {
       return res.status(404).json({
         success: false,
-        items: null,
-        message: "No adverts found",
+        items: [],
+        message: "No adverts found matching your search criteria",
       });
     }
+
     return res.status(200).json({
       success: true,
       items: theResult,
       message: "Adverts retrieved successfully",
     });
+
   } catch (error) {
     return res.status(500).json({
       success: false,
       error: error.message,
-      message: "Failed to retrieve adverts. An unexpected error occured",
+      message: "Failed to retrieve adverts. An unexpected error occurred",
     });
   }
 };
+
+//good
+// searching for adverts using title, price, category
+// const searchAdvert = async (req, res) => {
+//   try {
+//     const { title, price, category } = req.query;
+//     let searchByDetail = {};
+//     // Searching by title
+//     if (title !== undefined) {
+//       searchByDetail.title = { $regex: title, $options: "i" };
+//     }
+//     // searching by category
+//     if (category !== undefined) {
+//       searchByDetail.category = { $regex: category, $options: "i" };
+//     }
+//     // searching by price
+//     if (price !== undefined) {
+//       searchByDetail.price = parseFloat(price);
+//     }
+
+//     const theResult = await Advert.find(searchByDetail);
+
+//     if (!theResult) {
+//       return res.status(404).json({
+//         success: false,
+//         items: null,
+//         message: "No adverts found",
+//       });
+//     }
+//     // if(theResult.length === 0){
+//     //    return res.status(404).json({
+//     //     success: false,
+//     //     items: null,
+//     //     message: "No adverts found",
+//     //   });
+//     //}
+//     if(theResult){
+//       return res.status(200).json({
+//       success: true,
+//       items: theResult,
+//       message: "Adverts retrieved successfully",
+//     });
+//     }
+ 
+//   } catch (error) {
+//     return res.status(500).json({
+//       success: false,
+//       error: error.message,
+//       message: "Failed to retrieve adverts. An unexpected error occured",
+//     });
+//   }
+// };
 
 // const updateAdvert = async (req, res) => {
 //   try {
