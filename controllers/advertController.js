@@ -9,9 +9,12 @@ const fs = require("fs/promises");
 // const path = require("path");
 const advertValidation = require("../utils/advertValidate");
 
+
+// creating adverts
 const createAdvert = async (req, res) => {
   try {
     const { title, description, category, price } = req.body;
+
 
     const { error, value } = advertValidation.validate(req.body);
     if (error) {
@@ -154,6 +157,54 @@ const userOnlyViewAdvertById = async (req, res) => {
   }
 };
 
+// const searchAdvert = async (req, res) => {
+//   try {
+//     const { title, price, category } = req.query;
+//     let searchByDetail = {};
+
+//     // Search by title (case-insensitive)
+//     if (title?.trim()) {
+//       searchByDetail.title = { $regex: title.trim(), $options: "i" };
+//     }
+
+//     // Search by category (case-insensitive)
+//     if (category?.trim()) {
+//       searchByDetail.category = { $regex: category.trim(), $options: "i" };
+//     }
+
+//     // Search by price (exact match, parsed to float)
+//     if (price?.trim()) {
+//       const parsedPrice = parseFloat(price);
+//       if (!isNaN(parsedPrice)) {
+//         searchByDetail.price = parsedPrice;
+//       }
+//     }
+
+//     const theResult = await Advert.find(searchByDetail);
+
+//     if (!theResult || theResult.length === 0) {
+//       return res.status(404).json({
+//         success: false,
+//         items: [],
+//         message: "No adverts found",
+//       });
+//     }
+
+//     return res.status(200).json({
+//       success: true,
+//       items: theResult,
+//       message: "Adverts retrieved successfully",
+//     });
+//   } catch (error) {
+//     return res.status(500).json({
+//       success: false,
+//       error: error.message,
+//       message: "Failed to retrieve adverts. An unexpected error occurred",
+//     });
+//   }
+// };
+
+
 // searching for adverts using title, price, category
 const searchAdvert = async (req, res) => {
   try {
@@ -174,7 +225,7 @@ const searchAdvert = async (req, res) => {
 
     const theResult = await Advert.find(searchByDetail);
 
-    if (!theResult || theResult.length === 0) {
+    if (!theResult) {
       return res.status(404).json({
         success: false,
         items: null,
@@ -183,7 +234,7 @@ const searchAdvert = async (req, res) => {
     }
     return res.status(200).json({
       success: true,
-      items: allAdverts,
+      items: theResult,
       message: "Adverts retrieved successfully",
     });
   } catch (error) {
@@ -457,7 +508,6 @@ const getAllAdvertsByVendor = async (req, res) => {
         message: "No adverts found",
       });
     }
-
     return res.status(200).json({
       success: true,
       items: allAdverts,

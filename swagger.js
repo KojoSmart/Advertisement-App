@@ -6,9 +6,9 @@ const doc = {
     description: "Description",
   },
   host: "advertisement-app-1-gy0x.onrender.com",
-  //   host: 'library-api-k879.onrender.com',
+  // host: "localhost:8008",
+  // schemes: ["https"],
   schemes: ["https"],
-
   components: {
     securitySchemes: {
       bearerAuth: {

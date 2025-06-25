@@ -16,28 +16,30 @@ const {
   authorizedRoles,
   authMiddlewareHandler,
 } = require("../middlewares/authMiddleware");
-const x = require("../middlewares/authMiddleware");
-console.log(typeof x);
+
 
 // Only vendors can create
-
 router.post(
   "/vendorAddAdvert",
   authMiddlewareHandler,
   authorizedRoles("vendor"),
-  upload.single("image"),
+  upload.single("file"),
   // #swagger.security = [{"bearerAuth": []}],
- createAdvert
+  createAdvert
 );
-router.get("/userOnlyViewAdverts/:id", authMiddlewareHandler, userOnlyViewAdvertById);
+router.get(
+  "/userOnlyViewAdverts/:id",
+  authMiddlewareHandler,
+  userOnlyViewAdvertById
+);
 
 router.put(
   "/vendorUpdateAdvert/:id",
   authMiddlewareHandler,
   authorizedRoles("vendor"),
-  upload.single("image"),
+  upload.single("file"),
   // #swagger.security = [{"bearerAuth": []}],
-   updateAdvert
+  updateAdvert
 );
 router.delete(
   "/vendorDeleteAdvert/:id",
@@ -48,18 +50,9 @@ router.delete(
   deleteAdvert
 );
 
-router.get(
-  "/userSearchItem/:search",
-  authMiddlewareHandler,
-  authorizedRoles("users"),
-  //#swagger.security = [{"bearerAuth": []}],
-  searchAdvert
-);
-router.get(
-  "/usersviewAlladverts",
- 
-  getAllAdverts
-);
+router.get("/usersviewAlladverts", getAllAdverts);
+router.get("/search",searchAdvert);
+
 
 router.get(
   "/allAdvertsByVendor",
@@ -78,20 +71,4 @@ router.get(
 );
 
 
-
-//  GET single advert by ID
-//router.get("/adverts/:id", getAdvertById);
-
-// Testing purpose
-// router.get(
-//   "/pro",
-//   authMiddlewareHandler,
-//   authorizedRoles("user"),
-//   (req, res) => {
-//     res.json({
-//       message: "This is a protected route",
-//       user: req.user.username,
-//     });
-//   }
-// );
 module.exports = router;
